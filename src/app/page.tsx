@@ -1,13 +1,20 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { Noto_Sans_KR } from "next/font/google";
+
+const noto = Noto_Sans_KR({
+  display: "block",
+  variable: "--font-noto",
+  preload: false,
+});
 
 interface Font {
   fontKeywords: string[];
   fontName: string;
   fontUrl: string;
-  fontColor: string;
-  backgroundColor: string;
+  fontSize: string;
+  fontWeight: string;
 }
 
 interface StyleRecommend {
@@ -22,83 +29,171 @@ interface StyleRecommend {
 // const MESSAGE_2 =
 //   "숲 속에 두 갈래 길이 있었다. 나는 사람들이 덜 간 길을 택했다. 그리고 그것으로 모든 것이 달라졌다.";
 
-const MESSAGE_3 =
-  "... 그리고 내가 눈으로 그에게 물었다 내게 다시 그래요를 요구하겠느냐고 그러자 그는 내게 물었다 내가 그래요라고 말하겠는가 하고 그래요 나의 야산의 꽃이여 그리고 나는 처음으로 그의 목을 팔로 껴안고 그를 나에게 끌어당겼다 향기를 풍기는 나의 젖가슴을 그가 느낄 수 있도록 말이다 그래요 그러자 그의 심장은 미친 듯이 뛰었다 그래서 나는 그래요 하고 말했다 그렇게 하겠어요 그래요.";
+// const MESSAGE_3 =
+//   "... 그리고 내가 눈으로 그에게 물었다 내게 다시 그래요를 요구하겠느냐고 그러자 그는 내게 물었다 내가 그래요라고 말하겠는가 하고 그래요 나의 야산의 꽃이여 그리고 나는 처음으로 그의 목을 팔로 껴안고 그를 나에게 끌어당겼다 향기를 풍기는 나의 젖가슴을 그가 느낄 수 있도록 말이다 그래요 그러자 그의 심장은 미친 듯이 뛰었다 그래서 나는 그래요 하고 말했다 그렇게 하겠어요 그래요.";
 
 const Home = () => {
-  const mainRef = useRef<HTMLElement>(null);
+  const mainRef = useRef<HTMLParagraphElement>(null);
+  const [step, setStep] = useState(1);
   const [font, setFont] = useState<StyleRecommend | undefined>();
   const [value, setValue] = useState("");
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleFontStyleClick = async (fontName: string, fontUrl: string) => {
+  // REFACTOR: 인자 객체로 리팩토링
+  const applyFontStyle = async (
+    fontName: string,
+    fontUrl: string,
+    fontSize: string,
+    fontWeight: string
+  ) => {
     const newFontFace = new FontFace(`${fontName}`, `url(${fontUrl})`);
     document.fonts.add(newFontFace);
     await newFontFace.load();
+
     if (mainRef.current) {
       mainRef.current.style.fontFamily = `${fontName}`;
+      mainRef.current.style.fontSize = `${fontSize}`;
+      mainRef.current.style.fontWeight = `${fontWeight}`;
     }
   };
 
   useEffect(() => {
     const fetchFontUrlBy = async (message: string) => {
-      setIsLoading(true);
-      const response = await fetch("api/chat", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ message }),
-      });
+      if (!message) {
+        return;
+      }
 
-      const { data } = await response.json();
-      setFont(data);
-      setIsLoading(false);
+      setIsLoading(true);
+      try {
+        const response = await fetch("api/chat", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ message }),
+        });
+        const { data } = await response.json();
+        setFont(data);
+      } catch (error) {
+        throw new Error("fetch font error");
+      } finally {
+        setIsLoading(false);
+      }
     };
 
     fetchFontUrlBy(message);
   }, [message]);
 
-  return (
-    <main ref={mainRef}>
-      <form
-        onSubmit={async (e) => {
-          e.preventDefault();
-          setMessage(value);
-        }}
-      >
-        <div style={{ display: "flex", flexDirection: "column" }}>
-          <label htmlFor="context">분석할 텍스트를 입력해주세요.</label>
-          {isLoading ? (
-            <p>분석중입니다</p>
-          ) : (
-            <textarea
-              id="context"
-              name="context"
-              cols={5}
-              rows={15}
-              value={value}
-              onChange={(e) => {
-                setValue(e.target.value);
-              }}
-            ></textarea>
-          )}
-          <button type="submit">분석하기</button>
-        </div>
-      </form>
+  useEffect(() => {
+    // TODO: 모든 suggestions에 대해 매핑
+    const fontSuggestion = font?.suggestions[0];
+    if (!fontSuggestion) {
+      return;
+    }
 
-      {font?.suggestions.map(({ fontName, fontUrl }) => (
-        <div key={fontUrl}>
-          <button
-            onClick={() => {
-              handleFontStyleClick(fontName, fontUrl);
-            }}
-          >
-            <p>{fontName}</p>
-          </button>
-        </div>
-      ))}
+    const { fontName, fontUrl, fontSize, fontWeight } = fontSuggestion;
+    applyFontStyle(fontName, fontUrl, fontSize, fontWeight);
+  }, [font]);
+
+  return (
+    <main
+      className={`relative min-h-screen flex items-center overflow-hidden bg-lightGray ${noto.variable}`}
+    >
+      <div className="flex flex-col items-center gap-8 w-full h-full">
+        <h2 className="w-full flex flex-col items-center text-4xl text-chacol whitespace-nowrap">
+          <span className="font-bold">contextyler</span>
+        </h2>
+
+        {/* TODO: step에 따라 동적으로 하위 요소 렌더링하는 함수로 분리 */}
+        {step === 1 && (
+          <>
+            <p className="text text-center text-test whitespace-pre-wrap">
+              {`글의 문맥을 분석해 글의 성격과 어울리는 폰트 스타일을 추천합니다`}
+            </p>
+            {/* TODO: 버튼 컴포넌트로 분리 */}
+            <button
+              className="w-24 font-semibold text-sm bg-point text-white p-3 rounded-full hover:drop-shadow-md hover:opacity-70 transition-all"
+              onClick={() => {
+                setStep(2);
+              }}
+            >
+              시작하기
+            </button>
+          </>
+        )}
+
+        {step === 2 && (
+          <>
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault();
+                setMessage(value);
+                setStep(3);
+              }}
+            >
+              <div className="flex flex-col items-center gap-5">
+                {isLoading ? (
+                  <p>...분석중입니다</p>
+                ) : (
+                  <textarea
+                    className="bg-lightGray border-solid border border-chacol rounded-xl placeholder:text-gray p-4 drop-shadow-sm"
+                    id="context"
+                    name="context"
+                    cols={60}
+                    rows={8}
+                    placeholder="분석할 텍스트를 입력해주세요."
+                    value={value}
+                    onChange={(e) => {
+                      setValue(e.target.value);
+                    }}
+                  ></textarea>
+                )}
+                <button
+                  className="w-24 font-semibold text-sm bg-point text-white p-3 rounded-full hover:drop-shadow-md hover:opacity-70 transition-all"
+                  type="submit"
+                >
+                  분석하기
+                </button>
+              </div>
+            </form>
+          </>
+        )}
+
+        {step === 3 && !!font && (
+          <>
+            {isLoading ? (
+              <p>...분석중입니다.</p>
+            ) : (
+              <div className="w-1/2">
+                <p
+                  className="text-xl p-12 px-20 rounded bg-white text-test"
+                  ref={mainRef}
+                >
+                  {message}
+                </p>
+                <p>분석 요약: {font.abstract}</p>
+                <p>
+                  키워드:
+                  {font.keywords.map((keyword) => (
+                    <span key={keyword}>{keyword}</span>
+                  ))}
+                </p>
+                <p>폰트: {font.suggestions[0].fontName}</p>
+                <p>폰트 키워드: {font.suggestions[0].fontKeywords}</p>
+                <button
+                  className="w-24 font-semibold text-sm bg-point text-white p-3 rounded-full hover:drop-shadow-md hover:opacity-70 transition-all"
+                  onClick={() => {
+                    setStep(2);
+                  }}
+                >
+                  돌아가기
+                </button>
+              </div>
+            )}
+          </>
+        )}
+      </div>
     </main>
   );
 };

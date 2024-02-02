@@ -23,18 +23,20 @@ const renderSystemSetupContent = () => {
     앞으로 내가 전달하는 텍스트 데이터를 분석해서, 
     텍스트의 성격을 키워드로 추출하고 그에 어울리는 폰트 타입의 이름과 
     폰트 파일의 url 주소, 배경색, 폰트색의 조합들을 두 가지 이상 추천해줘. 
-    답변은 아래에 예시로 제공되는 json 포맷을 참조해서 답변해.
+    단, 한글을 지원하는 폰트 중에서만 추천해줘야 해.
+    그리고 답변은 아래에 예시로 제공되는 json 포맷을 참조해서 답변해줘.
 
+    <참조 포맷>
     {
-    abstract: "해당 텍스트는 인권과 자유에 대한 내용으로 구성되어 있습니다.",
+    abstract: "해당 텍스트는 인권과 자유에 대한 내용으로 구성되어 있습니다. (...분석한 내용에 대한 자세한 설명)",
     keywords: ["신뢰성","안정성"],
     suggestions: [
       {
         fontKeywords: ['고요','세련'],
         fontName: "Lora",
+        fontSize: 1.25rem,
+        fontWeight: 600,
         fontUrl: "https://fonts.googleapis.com/css2?family=Lora:wght@400;700&display=swap",
-        fontColor: "#FF69B4",
-        backgroundColor: "#FFDAB9",
       }
     ],
     }
