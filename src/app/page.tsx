@@ -33,39 +33,27 @@ const Home = () => {
   // TEST: 모든 제안에 대해 동적 렌더링 구현하기
 
   return (
+    // TODO: layout으로 공통 ui 추출하기
     <main
-      className={`relative min-h-screen flex items-center overflow-hidden bg-lightGray ${noto.variable}`}
+      className={`relative min-h-screen flex items-center overflow-auto bg-lightGray ${noto.variable}`}
     >
       <div className="flex flex-col items-center gap-8 w-full h-full">
         <h2 className="w-full flex flex-col items-center text-4xl text-chacol whitespace-nowrap">
           <span className="font-bold">contextyler</span>
         </h2>
+        <p className="text text-center text-test whitespace-pre-wrap">
+          {`글의 문맥을 분석해 글의 성격과 어울리는 폰트 스타일을 추천합니다`}
+        </p>
 
         {/* TODO: step에 따라 동적으로 하위 요소 렌더링하는 함수로 분리 */}
-        {step === 1 && (
-          <>
-            <p className="text text-center text-test whitespace-pre-wrap">
-              {`글의 문맥을 분석해 글의 성격과 어울리는 폰트 스타일을 추천합니다`}
-            </p>
-            {/* TODO: 버튼 컴포넌트로 분리 */}
-            <button
-              className="w-24 font-semibold text-sm bg-point text-white p-3 rounded-full hover:drop-shadow-md hover:opacity-70 transition-all"
-              onClick={() => {
-                setStep(2);
-              }}
-            >
-              시작하기
-            </button>
-          </>
-        )}
 
-        {step === 2 && (
+        {step === 1 && (
           <>
             <form
               onSubmit={async (e) => {
                 e.preventDefault();
                 setContext(value);
-                setStep(3);
+                setStep(2);
               }}
             >
               <div className="flex flex-col items-center gap-5">
@@ -96,7 +84,7 @@ const Home = () => {
           </>
         )}
 
-        {step === 3 && !!analyze && (
+        {step === 2 && !!analyze && (
           <>
             {isLoading ? (
               <p>...분석중입니다.</p>
@@ -120,7 +108,7 @@ const Home = () => {
                 <button
                   className="w-24 font-semibold text-sm bg-point text-white p-3 rounded-full hover:drop-shadow-md hover:opacity-70 transition-all"
                   onClick={() => {
-                    setStep(2);
+                    setStep(1);
                   }}
                 >
                   돌아가기
