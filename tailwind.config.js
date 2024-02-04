@@ -17,20 +17,17 @@ module.exports = {
         fontWeight: {
           "0%": {
             "font-weight": 100,
-            color: "#48475D",
           },
           "50%": {
             "font-weight": 900,
-            color: "#FE2759",
           },
           "100%": {
             "font-weight": 100,
-            color: "#48475D",
           },
         },
       },
       animation: {
-        fontLoop: "fontWeight 4s infinite both",
+        fontLoop: "fontWeight 6s infinite both",
       },
     },
   },
