@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { Noto_Sans_KR } from "next/font/google";
-import { useFontRecommend } from "./hooks/useFontRecommend";
+import { useContextAnalyze } from "./hooks/useFontRecommend";
 
 const noto = Noto_Sans_KR({
   display: "block",
@@ -25,10 +25,12 @@ const Home = () => {
   const [value, setValue] = useState("");
   const {
     isLoading,
-    data: font,
+    data: analyze,
     context,
     setContext,
-  } = useFontRecommend(mainRef);
+  } = useContextAnalyze(mainRef);
+
+  // TEST: 모든 제안에 대해 동적 렌더링 구현하기
 
   return (
     <main
@@ -94,7 +96,7 @@ const Home = () => {
           </>
         )}
 
-        {step === 3 && !!font && (
+        {step === 3 && !!analyze && (
           <>
             {isLoading ? (
               <p>...분석중입니다.</p>
@@ -106,15 +108,15 @@ const Home = () => {
                 >
                   {context}
                 </p>
-                <p>분석 요약: {font.abstract}</p>
+                <p>분석 요약: {analyze.abstract}</p>
                 <p>
                   키워드:
-                  {font.keywords.map((keyword) => (
+                  {analyze.keywords.map((keyword) => (
                     <span key={keyword}>{keyword}</span>
                   ))}
                 </p>
-                <p>폰트: {font.suggestions[0].fontName}</p>
-                <p>폰트 키워드: {font.suggestions[0].fontKeywords}</p>
+                <p>폰트: {analyze.suggestions[0].fontName}</p>
+                <p>폰트 키워드: {analyze.suggestions[0].fontKeywords}</p>
                 <button
                   className="w-24 font-semibold text-sm bg-point text-white p-3 rounded-full hover:drop-shadow-md hover:opacity-70 transition-all"
                   onClick={() => {

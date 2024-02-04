@@ -31,10 +31,10 @@ const applyFontStyle = async (
   }
 };
 
-export const useFontRecommend = (targetRef: RefObject<HTMLElement>) => {
+export const useContextAnalyze = (targetRef: RefObject<HTMLElement>) => {
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState("");
-  const [font, setFont] = useState<ContextAnalyze | undefined>();
+  const [analyze, setAnalyze] = useState<ContextAnalyze | undefined>();
 
   useEffect(() => {
     const fetchFontUrlBy = async (message: string) => {
@@ -52,7 +52,7 @@ export const useFontRecommend = (targetRef: RefObject<HTMLElement>) => {
           body: JSON.stringify({ message }),
         });
         const { data } = await response.json();
-        setFont(data);
+        setAnalyze(data);
         // FIX: 간혹 분석 자체가 실패하는 경우가 발생하는데, 에러 확인하기.
       } catch (error) {
         throw new Error("fetch font error");
@@ -66,13 +66,13 @@ export const useFontRecommend = (targetRef: RefObject<HTMLElement>) => {
 
   useEffect(() => {
     // TODO: 모든 suggestions에 대해 매핑
-    const fontOption = font?.suggestions[0];
+    const fontOption = analyze?.suggestions[0];
     if (!fontOption) {
       return;
     }
 
     applyFontStyle(fontOption, targetRef);
-  }, [font, targetRef]);
+  }, [analyze, targetRef]);
 
-  return { isLoading, data: font, context: message, setContext: setMessage };
+  return { isLoading, data: analyze, context: message, setContext: setMessage };
 };
