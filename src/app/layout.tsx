@@ -26,7 +26,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => (
           {`글의 문맥을 분석해 어울리는 폰트 스타일을 추천합니다.`}
         </p>
       </header>
-      {children}
+      <main className="overflow-auto w-full h-full">{children}</main>
     </body>
   </html>
 );

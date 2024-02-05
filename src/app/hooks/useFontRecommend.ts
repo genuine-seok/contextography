@@ -10,7 +10,7 @@ interface Font {
 
 interface FontOption extends Omit<Font, "fontKeywords"> {}
 
-interface ContextAnalyze {
+export interface ContextAnalyze {
   abstract: string;
   keywords: string[];
   suggestions: Font[];
