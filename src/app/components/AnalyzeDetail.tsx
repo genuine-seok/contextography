@@ -1,36 +1,45 @@
-import { useRef } from "react";
-import { ContextAnalyze } from "../hooks/useFontRecommend";
+import { useAnalyzeStore } from "../store/useAnalyzeStore";
+import { AnalyzeResult } from "../hooks/useContextAnalyze";
 
 interface AnalyzeDetailProps {
   text: string;
-  analyze: ContextAnalyze;
+  result: AnalyzeResult;
   onBack?: () => void;
 }
 
 export const AnalyzeDetail = ({
   text,
-  analyze,
+  result: { abstract, keywords, suggestions },
   onBack,
 }: AnalyzeDetailProps) => {
-  const mainRef = useRef<HTMLParagraphElement>(null);
+  const [textRef, setTextRef] = useAnalyzeStore((state) => [
+    state.textRef,
+    state.setTextRef,
+  ]);
 
   return (
     <section className="w-1/2">
       <p
         className="text-xl p-12 px-20 rounded bg-white text-test"
-        ref={mainRef}
+        ref={(ref) => {
+          if (!ref || !!textRef) {
+            return;
+          }
+
+          setTextRef(ref);
+        }}
       >
         {text}
       </p>
-      <p>분석 요약: {analyze.abstract}</p>
+      <p>분석 요약: {abstract}</p>
       <p>
         키워드:
-        {analyze.keywords.map((keyword) => (
+        {keywords.map((keyword) => (
           <span key={keyword}>{keyword}</span>
         ))}
       </p>
-      <p>폰트: {analyze.suggestions[0].fontName}</p>
-      <p>폰트 키워드: {analyze.suggestions[0].fontKeywords}</p>
+      <p>폰트: {suggestions[0].fontName}</p>
+      <p>폰트 키워드: {suggestions[0].fontKeywords}</p>
       <button
         className="w-24 font-semibold text-sm bg-point text-white p-3 rounded-full hover:drop-shadow-md hover:opacity-70 transition-all"
         onClick={() => {
