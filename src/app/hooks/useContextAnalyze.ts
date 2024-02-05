@@ -1,4 +1,5 @@
-import { RefObject, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import { useAnalyzeStore } from "../store/useAnalyzeStore";
 
 interface Font {
   fontKeywords: string[];
@@ -31,10 +32,11 @@ const applyFontStyle = async (
   }
 };
 
-export const useContextAnalyze = (targetRef?: HTMLElement | null) => {
+export const useContextAnalyze = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [result, setResult] = useState<AnalyzeResult | undefined>();
+  const textRefMap = useAnalyzeStore((state) => state.textRefMap);
 
   useEffect(() => {
     const fetchFontUrlBy = async (message: string) => {
@@ -65,14 +67,14 @@ export const useContextAnalyze = (targetRef?: HTMLElement | null) => {
   }, [message]);
 
   useEffect(() => {
-    // TODO: 모든 suggestions에 대해 매핑
-    const fontOption = result?.suggestions[0];
-    if (!fontOption) {
-      return;
-    }
+    result?.suggestions.forEach((fontOption) => {
+      const targetRef = textRefMap.get(fontOption.fontName);
 
-    applyFontStyle(fontOption, targetRef);
-  }, [result, targetRef]);
+      if (targetRef) {
+        applyFontStyle(fontOption, targetRef);
+      }
+    });
+  }, [result, textRefMap]);
 
   return {
     isLoading,

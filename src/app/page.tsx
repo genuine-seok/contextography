@@ -17,22 +17,18 @@ import { useAnalyzeStore } from "./store/useAnalyzeStore";
 const Home = () => {
   // REFACTOR: useStep
   const [step, setStep] = useState(1);
-  const [value, textRef] = useAnalyzeStore((state) => [
-    state.value,
-    state.textRef,
-  ]);
+  const [value] = useAnalyzeStore((state) => [state.value]);
   const {
     isLoading,
     data: result,
     targetText,
     setTargetText,
-  } = useContextAnalyze(textRef);
+  } = useContextAnalyze();
 
   if (isLoading) {
     return <p>...분석중입니다.</p>;
   }
 
-  // TEST: 모든 제안에 대해 동적 렌더링 구현하기
   return (
     <section className="flex justify-center gap-8 h-full w-full p-5">
       {/* TODO: step에 따라 동적으로 하위 요소 렌더링하는 함수로 분리 */}

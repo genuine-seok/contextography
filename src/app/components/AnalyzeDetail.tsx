@@ -12,25 +12,10 @@ export const AnalyzeDetail = ({
   result: { abstract, keywords, suggestions },
   onBack,
 }: AnalyzeDetailProps) => {
-  const [textRef, setTextRef] = useAnalyzeStore((state) => [
-    state.textRef,
-    state.setTextRef,
-  ]);
+  const textRefMap = useAnalyzeStore((state) => state.textRefMap);
 
   return (
     <section className="w-1/2">
-      <p
-        className="text-xl p-12 px-20 rounded bg-white text-test"
-        ref={(ref) => {
-          if (!ref || !!textRef) {
-            return;
-          }
-
-          setTextRef(ref);
-        }}
-      >
-        {text}
-      </p>
       <p>분석 요약: {abstract}</p>
       <p>
         키워드:
@@ -38,8 +23,28 @@ export const AnalyzeDetail = ({
           <span key={keyword}>{keyword}</span>
         ))}
       </p>
-      <p>폰트: {suggestions[0].fontName}</p>
-      <p>폰트 키워드: {suggestions[0].fontKeywords}</p>
+
+      {/* REFACTOR: FontRecommend */}
+      {suggestions.map(({ fontName, fontKeywords }) => (
+        <>
+          <p
+            className="text-xl p-12 px-20 rounded bg-white text-test"
+            ref={(ref) => {
+              if (!ref || textRefMap.has(fontName)) {
+                return;
+              }
+
+              textRefMap.set(fontName, ref);
+              // setTextRef(ref);
+            }}
+          >
+            {text}
+          </p>
+          <p>폰트: {fontName}</p>
+          <p>폰트 키워드: {fontKeywords}</p>
+        </>
+      ))}
+
       <button
         className="w-24 font-semibold text-sm bg-point text-white p-3 rounded-full hover:drop-shadow-md hover:opacity-70 transition-all"
         onClick={() => {
