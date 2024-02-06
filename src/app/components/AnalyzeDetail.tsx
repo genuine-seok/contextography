@@ -3,16 +3,17 @@ import { AnalyzeResult } from "../hooks/useContextAnalyze";
 
 interface AnalyzeDetailProps {
   text: string;
-  result: AnalyzeResult;
+  result?: AnalyzeResult;
   onBack?: () => void;
 }
 
-export const AnalyzeDetail = ({
-  text,
-  result: { abstract, keywords, suggestions },
-  onBack,
-}: AnalyzeDetailProps) => {
+export const AnalyzeDetail = ({ text, result, onBack }: AnalyzeDetailProps) => {
   const textRefMap = useAnalyzeStore((state) => state.textRefMap);
+
+  if (!result) {
+    return null;
+  }
+  const { abstract, keywords, suggestions } = result;
 
   return (
     <section className="w-1/2">
@@ -35,7 +36,6 @@ export const AnalyzeDetail = ({
               }
 
               textRefMap.set(fontName, ref);
-              // setTextRef(ref);
             }}
           >
             {text}
