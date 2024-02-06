@@ -24,32 +24,31 @@ const Home = () => {
   } = useContextAnalyze();
   const [Flow, setStep] = useFlow(["분석 준비", "분석 결과"] as const);
 
+  // TODO: LoadingIndicator 추가
   if (isLoading) {
     return <p>...분석중입니다.</p>;
   }
 
   return (
-    <section className="flex justify-center gap-8 h-full w-full p-5">
-      <Flow>
-        <Flow.Step name="분석 준비">
-          <AnalyzeForm
-            onSubmit={() => {
-              setTargetText(value);
-              setStep("분석 결과");
-            }}
-          />
-        </Flow.Step>
-        <Flow.Step name="분석 결과">
-          <AnalyzeDetail
-            text={targetText}
-            result={result}
-            onBack={() => {
-              setStep("분석 준비");
-            }}
-          />
-        </Flow.Step>
-      </Flow>
-    </section>
+    <Flow>
+      <Flow.Step name="분석 준비">
+        <AnalyzeForm
+          onSubmit={() => {
+            setTargetText(value);
+            setStep("분석 결과");
+          }}
+        />
+      </Flow.Step>
+      <Flow.Step name="분석 결과">
+        <AnalyzeDetail
+          text={targetText}
+          result={result}
+          onBack={() => {
+            setStep("분석 준비");
+          }}
+        />
+      </Flow.Step>
+    </Flow>
   );
 };
 

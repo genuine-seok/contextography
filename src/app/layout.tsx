@@ -16,7 +16,7 @@ const noto = Noto_Sans_KR({
 const RootLayout = ({ children }: { children: React.ReactNode }) => (
   <html className="w-full h-full" lang="en">
     <body
-      className={`relative flex flex-col h-full w-full overflow-auto bg-lightGray ${noto.className}`}
+      className={`relative flex flex-col h-full w-full overflow-auto ${noto.className}`}
     >
       <header className="flex flex-col gap-4 p-5 h-32">
         <h1 className="w-full flex flex-col items-center text-4xl font-bold text-chacol whitespace-nowrap animate-fontLoop">
@@ -26,7 +26,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => (
           {`글의 문맥을 분석해 어울리는 폰트 스타일을 추천합니다.`}
         </p>
       </header>
-      <main className="overflow-auto w-full h-full">{children}</main>
+      <main className="overflow-auto w-full h-full leading-6">{children}</main>
     </body>
   </html>
 );
