@@ -1,2 +1,2 @@
-export * from "./AnalyzeForm";
-export * from "./AnalyzeDetail";
+export * from "./AnalysisForm";
+export * from "./AnalysisDetail";

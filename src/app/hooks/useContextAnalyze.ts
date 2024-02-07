@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect } from "react";
 import { useAnalyzeStore } from "../store/useAnalyzeStore";
+import { useShallow } from "zustand/react/shallow";
 
-interface Font {
+export interface Font {
   fontKeywords: string[];
   fontName: string;
   fontUrl: string;
@@ -33,10 +34,31 @@ const applyFontStyle = async (
 };
 
 export const useContextAnalyze = () => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [message, setMessage] = useState("");
-  const [result, setResult] = useState<AnalyzeResult | undefined>();
-  const textRefMap = useAnalyzeStore((state) => state.textRefMap);
+  const [
+    message,
+    setMessage,
+    isLoading,
+    setIsLoading,
+    value,
+    data,
+    setData,
+    textRefMap,
+  ] = useAnalyzeStore(
+    useShallow((state) => [
+      state.message,
+      state.setMessage,
+      state.isLoading,
+      state.setIsLoading,
+      state.value,
+      state.data,
+      state.setData,
+      state.textRefMap,
+    ])
+  );
+
+  const mutateContextAnalyze = useCallback(() => {
+    setMessage(value);
+  }, [setMessage, value]);
 
   useEffect(() => {
     const fetchFontUrlBy = async (message: string) => {
@@ -54,7 +76,7 @@ export const useContextAnalyze = () => {
           body: JSON.stringify({ message }),
         });
         const { data } = await response.json();
-        setResult(data);
+        setData(data);
         // FIX: 간혹 분석 자체가 실패하는 경우가 발생하는데, 에러 확인하기.
       } catch (error) {
         throw new Error("fetch font error");
@@ -64,21 +86,22 @@ export const useContextAnalyze = () => {
     };
 
     fetchFontUrlBy(message);
-  }, [message]);
+  }, [message, setData, setIsLoading]);
 
   useEffect(() => {
-    result?.suggestions.forEach((fontOption) => {
+    data?.suggestions.forEach((fontOption) => {
       const targetRef = textRefMap.get(fontOption.fontName);
 
       if (targetRef) {
         applyFontStyle(fontOption, targetRef);
       }
     });
-  }, [result, textRefMap]);
+  }, [data, textRefMap]);
 
   return {
     isLoading,
-    data: result,
+    data,
+    mutate: mutateContextAnalyze,
     targetText: message,
     setTargetText: setMessage,
   };

@@ -1,8 +1,6 @@
 "use client";
 
-import { useContextAnalyze } from "./hooks/useContextAnalyze";
-import { AnalyzeDetail, AnalyzeForm } from "./components";
-import { useAnalyzeStore } from "./store/useAnalyzeStore";
+import { AnalysisDetail, AnalysisForm } from "./components";
 import { useFlow } from "./hooks/useFlow";
 
 // const MESSAGE_1 =
@@ -15,34 +13,19 @@ import { useFlow } from "./hooks/useFlow";
 //   "... 그리고 내가 눈으로 그에게 물었다 내게 다시 그래요를 요구하겠느냐고 그러자 그는 내게 물었다 내가 그래요라고 말하겠는가 하고 그래요 나의 야산의 꽃이여 그리고 나는 처음으로 그의 목을 팔로 껴안고 그를 나에게 끌어당겼다 향기를 풍기는 나의 젖가슴을 그가 느낄 수 있도록 말이다 그래요 그러자 그의 심장은 미친 듯이 뛰었다 그래서 나는 그래요 하고 말했다 그렇게 하겠어요 그래요.";
 
 const Home = () => {
-  const [value] = useAnalyzeStore((state) => [state.value]);
-  const {
-    isLoading,
-    data: result,
-    targetText,
-    setTargetText,
-  } = useContextAnalyze();
   const [Flow, setStep] = useFlow(["분석 준비", "분석 결과"] as const);
-
-  // TODO: LoadingIndicator 추가
-  if (isLoading) {
-    return <p>...분석중입니다.</p>;
-  }
 
   return (
     <Flow>
       <Flow.Step name="분석 준비">
-        <AnalyzeForm
+        <AnalysisForm
           onSubmit={() => {
-            setTargetText(value);
             setStep("분석 결과");
           }}
         />
       </Flow.Step>
       <Flow.Step name="분석 결과">
-        <AnalyzeDetail
-          text={targetText}
-          result={result}
+        <AnalysisDetail
           onBack={() => {
             setStep("분석 준비");
           }}

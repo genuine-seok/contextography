@@ -1,15 +1,16 @@
-import { FormEventHandler } from "react";
+import { FormEventHandler, useEffect } from "react";
 import { useAnalyzeStore } from "../store/useAnalyzeStore";
+import { Button } from "@/components";
+import { useShallow } from "zustand/react/shallow";
 
-interface AnalyzeFormProps {
+interface AnalysisFormProps {
   onSubmit?: FormEventHandler<HTMLFormElement>;
 }
 
-export const AnalyzeForm = ({ onSubmit }: AnalyzeFormProps) => {
-  const [value, setValue] = useAnalyzeStore((state) => [
-    state.value,
-    state.setValue,
-  ]);
+export const AnalysisForm = ({ onSubmit }: AnalysisFormProps) => {
+  const [value, setValue, setMessage] = useAnalyzeStore(
+    useShallow((state) => [state.value, state.setValue, state.setMessage])
+  );
 
   return (
     <section className="w-full h-full pb-8">
@@ -17,6 +18,7 @@ export const AnalyzeForm = ({ onSubmit }: AnalyzeFormProps) => {
         className="h-full w-full"
         onSubmit={async (e) => {
           e.preventDefault();
+          setMessage(value);
           onSubmit?.(e);
         }}
       >
@@ -32,12 +34,7 @@ export const AnalyzeForm = ({ onSubmit }: AnalyzeFormProps) => {
               setValue?.(e.target.value);
             }}
           />
-          <button
-            className="w-24 font-semibold text-sm bg-point text-white p-3 rounded-full hover:drop-shadow-md hover:opacity-70 transition-all"
-            type="submit"
-          >
-            분석하기
-          </button>
+          <Button type="submit">분석하기</Button>
         </div>
       </form>
     </section>
